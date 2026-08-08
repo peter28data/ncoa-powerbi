@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aging in America — NCOA Public Data | Power BI</title>
+<style>
+  :root{
+    --pbi-canvas:#F3F2F1;
+    --pbi-topbar:#201F1E;
+    --pbi-border:#E1DFDD;
+    --pbi-text:#252423;
+    --pbi-subtext:#605E5C;
+    --teal:#01B8AA;
+    --slate:#374649;
+    --red:#FD625E;
+    --yellow:#F2C80F;
+    --blue:#118DFF;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+    color:var(--pbi-text);
+    background:var(--pbi-canvas);
+    font-size:13px;
+  }
+  .pbi-topbar{
+    background:var(--pbi-topbar);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 16px;
+    height:44px;
+    font-size:13px;
+  }
+  .pbi-topbar .brand{display:flex;align-items:center;gap:8px;font-weight:600;}
+  .pbi-topbar .brand svg{width:18px;height:18px;}
+  .pbi-topbar .crumbs{color:#C8C6C4;font-weight:400;}
+  .pbi-topbar .crumbs b{color:#fff;font-weight:600;}
+  .pbi-topbar .actions{display:flex;gap:18px;color:#C8C6C4;}
+
+  .pbi-titlebar{
+    background:#fff;
+    border-bottom:1px solid var(--pbi-border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 20px;
+  }
+  .pbi-titlebar h1{font-size:16px;margin:0;font-weight:600;}
+  .pbi-titlebar .meta{font-size:11px;color:var(--pbi-subtext);margin-top:2px;}
+  .pbi-titlebar .toggles{display:flex;gap:8px;}
+  .pill{
+    font-size:11px;
+    padding:4px 10px;
+    border-radius:3px;
+    border:1px solid var(--pbi-border);
+    color:var(--pbi-subtext);
+    background:#fafafa;
+  }
+  .pill.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+
+  .pbi-body{display:flex;align-items:flex-start;min-height:calc(100vh - 44px - 49px - 40px - 34px);}
+
+  .pbi-filterpane{
+    width:190px;
+    flex-shrink:0;
+    background:#fff;
+    border-right:1px solid var(--pbi-border);
+    padding:14px 14px 20px;
+    min-height:100%;
+  }
+  .pbi-filterpane h2{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--pbi-subtext);
+    margin:0 0 10px;
+    font-weight:700;
+  }
+  .slicer-group{margin-bottom:20px;}
+  .slicer-label{font-size:12px;font-weight:600;margin-bottom:6px;color:var(--pbi-text);}
+  .slicer-btn{
+    display:block;
+    width:100%;
+    text-align:left;
+    padding:6px 9px;
+    margin-bottom:4px;
+    border:1px solid var(--pbi-border);
+    background:#fff;
+    font-size:12px;
+    color:var(--pbi-text);
+    border-radius:2px;
+    cursor:pointer;
+  }
+  .slicer-btn:hover{background:#F5F5F5;}
+  .slicer-btn.selected{
+    background:#E9F5FF;
+    border-color:var(--blue);
+    color:var(--blue);
+    font-weight:600;
+  }
+  .slicer-note{font-size:11px;color:var(--pbi-subtext);line-height:1.5;background:#FAFAFA;border:1px solid var(--pbi-border);padding:8px;border-radius:3px;}
+
+  .pbi-canvas{flex:1;padding:18px 22px;}
+
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px;}
+  .kpi-card{
+    background:#fff;border:1px solid var(--pbi-border);border-radius:3px;
+    padding:14px 16px;box-shadow:0 1px 2px rgba(0,0,0,.04);
+  }
+  .kpi-card .label{font-size:11px;color:var(--pbi-subtext);font-weight:600;text-transform:uppercase;letter-spacing:.02em;}
+  .kpi-card .value{font-size:28px;font-weight:700;margin:4px 0 2px;color:var(--pbi-text);}
+  .kpi-card .sub{font-size:11px;color:var(--pbi-subtext);}
+  .kpi-card .value.teal{color:var(--teal);}
+  .kpi-card .value.red{color:var(--red);}
+  .kpi-card .value.slate{color:var(--slate);}
+  .kpi-card .value.blue{color:var(--blue);}
+
+  .viz-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .viz-card{
+    background:#fff;border:1px solid var(--pbi-border);border-radius:3px;
+    box-shadow:0 1px 2px rgba(0,0,0,.04);
+    padding:12px 16px 16px;
+  }
+  .viz-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .viz-title{font-size:13px;font-weight:600;}
+  .viz-dots{color:var(--pbi-subtext);font-size:14px;letter-spacing:1px;cursor:default;}
+  .viz-caption{font-size:11px;color:var(--pbi-subtext);margin-bottom:8px;}
+  .readout{
+    font-size:12px;background:#FAFAFA;border-left:3px solid var(--blue);
+    padding:6px 10px;margin-top:8px;color:var(--pbi-text);border-radius:0 3px 3px 0;
+  }
+  .footnote{font-size:10.5px;color:var(--pbi-subtext);margin-top:8px;line-height:1.4;}
+
+  table{width:100%;border-collapse:collapse;font-size:12px;}
+  th{
+    text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;
+    color:var(--pbi-subtext);border-bottom:2px solid var(--pbi-border);padding:6px 8px;
+  }
+  td{padding:8px;border-bottom:1px solid var(--pbi-border);}
+  tr:last-child td{border-bottom:none;}
+  .cond-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;}
+
+  .pbi-pagetabs{
+    display:flex;gap:2px;background:#fff;border-top:1px solid var(--pbi-border);padding:0 10px;
+  }
+  .tab{padding:9px 16px;font-size:12px;color:var(--pbi-subtext);border-bottom:3px solid transparent;cursor:default;}
+  .tab.active{color:var(--pbi-text);font-weight:600;border-bottom-color:var(--blue);}
+
+  .pbi-footer{
+    display:flex;justify-content:space-between;padding:8px 22px;font-size:10.5px;
+    color:var(--pbi-subtext);background:#fff;border-top:1px solid var(--pbi-border);
+  }
+
+  @media (max-width:900px){
+    .kpi-row{grid-template-columns:1fr 1fr;}
+    .viz-grid{grid-template-columns:1fr;}
+    .pbi-filterpane{width:150px;}
+  }
+</style>
+</head>
+<body>
+
+  <!-- Power BI service top bar -->
+  <div class="pbi-topbar">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="4" height="11" rx="1" fill="#F2C80F"/><rect x="10" y="5" width="4" height="16" rx="1" fill="#01B8AA"/><rect x="17" y="2" width="4" height="19" rx="1" fill="#118DFF"/></svg>
+      Power BI
+      <span class="crumbs">&nbsp;|&nbsp; Workspaces &nbsp;›&nbsp; NCOA Public Data &nbsp;›&nbsp; <b>Aging in America</b></span>
+    </div>
+    <div class="actions">
+      <span>Share</span><span>Export</span><span>⋯</span>
+    </div>
+  </div>
+
+  <!-- Report title bar -->
+  <div class="pbi-titlebar">
+    <div>
+      <h1>Aging in America: NCOA Public Data Overview</h1>
+      <div class="meta">Source: National Council on Aging (ncoa.org) public fact sheets &middot; Refreshed Aug 6, 2026</div>
+    </div>
+    <div class="toggles">
+      <span class="pill">Editing</span>
+      <span class="pill active">Reading view</span>
+    </div>
+  </div>
+
+  <div class="pbi-body">
+    <!-- Filter pane -->
+    <aside class="pbi-filterpane">
+      <h2>Filters</h2>
+      <div class="slicer-group">
+        <div class="slicer-label">Age Cohort</div>
+        <button class="slicer-btn selected" data-age="all">All older adults</button>
+        <button class="slicer-btn" data-age="65-74">Age 65–74</button>
+        <button class="slicer-btn" data-age="75+">Age 75+</button>
+      </div>
+      <div class="slicer-group">
+        <div class="slicer-label">Topic</div>
+        <button class="slicer-btn selected">Chronic Disease</button>
+        <button class="slicer-btn">Falls Prevention</button>
+        <button class="slicer-btn">Population</button>
+      </div>
+      <div class="slicer-note">
+        All figures reproduced from NCOA's public "Get the Facts" series and 2025 Falls ROI Executive Summary. No row-level or state-level microdata is published by NCOA — figures below are the aggregate statistics they release.
+      </div>
+    </aside>
+
+    <!-- Canvas -->
+    <main class="pbi-canvas">
+
+      <!-- KPI cards -->
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <div class="label">Adults age 65+</div>
+          <div class="value teal">57.8M</div>
+          <div class="sub">Projected to reach ~89M by 2060</div>
+        </div>
+        <div class="kpi-card">
+          <div class="label">Have &ge;1 chronic condition</div>
+          <div class="value slate">93%</div>
+          <div class="sub">80% have two or more</div>
+        </div>
+        <div class="kpi-card">
+          <div class="label">Fall at least once a year</div>
+          <div class="value red">1 in 4</div>
+          <div class="sub">~14M adults age 65+ annually</div>
+        </div>
+        <div class="kpi-card">
+          <div class="label">Annual cost of falls</div>
+          <div class="value blue">$80B</div>
+          <div class="sub">Non-fatal falls, health care costs, 2020</div>
+        </div>
+      </div>
+
+      <!-- Visuals -->
+      <div class="viz-grid">
+
+        <!-- Arthritis by age group (slicer-reactive) -->
+        <div class="viz-card">
+          <div class="viz-head">
+            <span class="viz-title">Arthritis Prevalence by Age Cohort</span>
+            <span class="viz-dots">&#8942;</span>
+          </div>
+          <div class="viz-caption">Share of adults reporting an arthritis diagnosis</div>
+          <svg viewBox="0 0 300 150" width="100%" height="150">
+            <line x1="30" y1="120" x2="290" y2="120" stroke="#E1DFDD" stroke-width="1"/>
+            <g id="bar-65-74">
+              <rect x="70" y="52" width="60" height="68" fill="#01B8AA" rx="2"/>
+              <text x="100" y="44" text-anchor="middle" font-size="13" font-weight="700" fill="#252423">44%</text>
+              <text x="100" y="134" text-anchor="middle" font-size="11" fill="#605E5C">Age 65–74</text>
+            </g>
+            <g id="bar-75plus">
+              <rect x="180" y="38" width="60" height="82" fill="#374649" rx="2"/>
+              <text x="210" y="30" text-anchor="middle" font-size="13" font-weight="700" fill="#252423">53.9%</text>
+              <text x="210" y="134" text-anchor="middle" font-size="11" fill="#605E5C">Age 75+</text>
+            </g>
+          </svg>
+          <div class="readout" id="arthritis-readout">Both cohorts shown. Select an age cohort in Filters to highlight one bar.</div>
+        </div>
+
+        <!-- Falls fear pre/post program -->
+        <div class="viz-card">
+          <div class="viz-head">
+            <span class="viz-title">Fear of Falling — Before vs. After Program</span>
+            <span class="viz-dots">&#8942;</span>
+          </div>
+          <div class="viz-caption">Self-reported fear of falling, pre/post falls-prevention program (2025 Falls ROI)</div>
+          <svg viewBox="0 0 300 150" width="100%" height="150">
+            <line x1="30" y1="120" x2="290" y2="120" stroke="#E1DFDD" stroke-width="1"/>
+            <!-- "A lot" pair -->
+            <rect x="45" y="88" width="34" height="32" fill="#FD625E" rx="2"/>
+            <text x="62" y="82" text-anchor="middle" font-size="11" font-weight="700" fill="#252423">13%</text>
+            <rect x="83" y="100" width="34" height="20" fill="#F2C80F" rx="2"/>
+            <text x="100" y="94" text-anchor="middle" font-size="11" font-weight="700" fill="#252423">8%</text>
+            <text x="81" y="134" text-anchor="middle" font-size="10.5" fill="#605E5C">Afraid &ldquo;a lot&rdquo;</text>
+            <!-- "A little" pair -->
+            <rect x="165" y="26" width="34" height="94" fill="#FD625E" rx="2"/>
+            <text x="182" y="20" text-anchor="middle" font-size="11" font-weight="700" fill="#252423">39%</text>
+            <rect x="203" y="6" width="34" height="114" fill="#F2C80F" rx="2"/>
+            <text x="220" y="0" text-anchor="middle" font-size="11" font-weight="700" fill="#252423" dy="10">47%</text>
+            <text x="201" y="134" text-anchor="middle" font-size="10.5" fill="#605E5C">Afraid &ldquo;a little&rdquo;</text>
+          </svg>
+          <div style="display:flex;gap:14px;font-size:10.5px;color:#605E5C;margin-top:2px;">
+            <span><span style="display:inline-block;width:8px;height:8px;background:#FD625E;margin-right:4px;"></span>Pre-program</span>
+            <span><span style="display:inline-block;width:8px;height:8px;background:#F2C80F;margin-right:4px;"></span>Post-program</span>
+          </div>
+          <div class="footnote">Respondents saying they were "not at all" afraid also rose slightly, from a 16% baseline (exact post-program figure not published).</div>
+        </div>
+
+        <!-- Population trend -->
+        <div class="viz-card">
+          <div class="viz-head">
+            <span class="viz-title">Older Adult Population Growth</span>
+            <span class="viz-dots">&#8942;</span>
+          </div>
+          <div class="viz-caption">Adults age 65+, present day to 2060 projection</div>
+          <svg viewBox="0 0 300 150" width="100%" height="150">
+            <line x1="30" y1="120" x2="290" y2="120" stroke="#E1DFDD" stroke-width="1"/>
+            <polyline points="40,110 100,96 160,78 220,54 270,26" fill="none" stroke="#118DFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="40" cy="110" r="4" fill="#118DFF"/>
+            <circle cx="270" cy="26" r="4" fill="#118DFF"/>
+            <text x="40" y="132" text-anchor="middle" font-size="10.5" fill="#605E5C">Now</text>
+            <text x="270" y="132" text-anchor="middle" font-size="10.5" fill="#605E5C">2060</text>
+            <text x="40" y="100" text-anchor="middle" font-size="12" font-weight="700" fill="#252423">57.8M</text>
+            <text x="270" y="16" text-anchor="middle" font-size="12" font-weight="700" fill="#252423">~89M</text>
+          </svg>
+          <div class="footnote">Trend line interpolated between NCOA's two reported figures (current count and 2060 projection). Intermediate-year values are illustrative, not published data.</div>
+        </div>
+
+        <!-- Chronic conditions table -->
+        <div class="viz-card">
+          <div class="viz-head">
+            <span class="viz-title">Leading Chronic Conditions</span>
+            <span class="viz-dots">&#8942;</span>
+          </div>
+          <div class="viz-caption">Prevalence among older adults, by reported cohort</div>
+          <table>
+            <thead>
+              <tr><th>Condition</th><th>Prevalence</th><th>Cohort</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="cond-dot" style="background:#FD625E;"></span>Heart disease</td>
+                <td>24.1%</td>
+                <td>Age 75+</td>
+              </tr>
+              <tr>
+                <td><span class="cond-dot" style="background:#01B8AA;"></span>Arthritis</td>
+                <td>44% / 53.9%</td>
+                <td>Age 65–74 / 75+</td>
+              </tr>
+              <tr>
+                <td><span class="cond-dot" style="background:#374649;"></span>Diabetes</td>
+                <td>20.1%</td>
+                <td>Age 65+</td>
+              </tr>
+              <tr>
+                <td><span class="cond-dot" style="background:#F2C80F;"></span>Obesity</td>
+                <td>~42%</td>
+                <td>Age 60+</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Report page tabs -->
+  <div class="pbi-pagetabs">
+    <div class="tab active">Overview</div>
+    <div class="tab">Falls Prevention</div>
+    <div class="tab">Chronic Disease Trends</div>
+  </div>
+
+  <div class="pbi-footer">
+    <span>Data: NCOA "Get the Facts on Older Americans," "Get the Facts on Falls Prevention," 2025 Falls ROI Executive Summary (ncoa.org)</span>
+    <span>Mockup for illustration &middot; not a real .pbix file</span>
+  </div>
+
+<script>
+  const btns = document.querySelectorAll('.slicer-btn[data-age]');
+  const bar6574 = document.getElementById('bar-65-74');
+  const bar75 = document.getElementById('bar-75plus');
+  const readout = document.getElementById('arthritis-readout');
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      const age = btn.dataset.age;
+
+      bar6574.style.opacity = 1;
+      bar75.style.opacity = 1;
+
+      if (age === '65-74') {
+        bar75.style.opacity = 0.25;
+        readout.textContent = 'Age 65–74 selected: 44% report an arthritis diagnosis — the most common chronic condition in this cohort.';
+      } else if (age === '75+') {
+        bar6574.style.opacity = 0.25;
+        readout.textContent = 'Age 75+ selected: 53.9% report an arthritis diagnosis, up from 44% in the 65–74 cohort.';
+      } else {
+        readout.textContent = 'Both cohorts shown. Select an age cohort in Filters to highlight one bar.';
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
