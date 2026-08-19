@@ -1,6 +1,6 @@
 <h1 align="center">Peter Garay-Robles </h1>
 
-<h3 align="center">A Data Engineer in SQL and Excel. </h3>
+<h3 align="center">A Data Professional in SQL and Excel. </h3>
 
 ----
 
