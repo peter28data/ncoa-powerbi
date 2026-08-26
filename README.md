@@ -13,6 +13,7 @@ Source Data From 2025 Falls ROI Report "Get The Facts" Series
 
 ![ncoa arthritis_falling_statistics](https://github.com/peter28data/ncoa-powerbi/blob/f402edf25856948e28345a708390a57ed6bd634a/images_ncoa/ncoa_powerbi_arthritis_falling_statistics.png)
 
+
 ---
 
 ## Executive Overview: Aging in America — Key Takeaways
