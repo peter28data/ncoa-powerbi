@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
-/* Design tokens (Tailwind core palette only — teal/indigo/amber/rose) */
+/* Design tokens (Tailwind core palette only — teal/indigo/amber/rose)  */
 /* ------------------------------------------------------------------ */
 
 const DEPT_STYLES = {
